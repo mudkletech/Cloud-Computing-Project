@@ -1,8 +1,10 @@
 import path from 'path'
+console.log('Server execution started...')
 import express from 'express'
 import dotenv from 'dotenv'
 import colors from 'colors'
 import morgan from 'morgan'
+import fs from 'fs'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import connectDB from './config/db.js'
 
@@ -36,7 +38,19 @@ const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '/frontend/build')))
+  const buildPath = path.join(__dirname, '/frontend/build')
+  console.log(`Checking for frontend build at: ${buildPath}`)
+
+  // Check if build directory exists (optional but helpful for debugging)
+  // We won't use fs.existsSync here to avoid blocking, but the static middleware will fail silently if not found.
+  // So we explicitly log it.
+  if (fs.existsSync(buildPath)) {
+    console.log('Frontend build found.')
+  } else {
+    console.error('CRITICAL ERROR: Frontend build NOT found at ' + buildPath)
+  }
+
+  app.use(express.static(buildPath))
 
   app.get('*', (req, res) =>
     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
