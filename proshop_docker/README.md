@@ -22,11 +22,13 @@ docker build -f proshop_docker/Dockerfile -t proshop .
 Once built, tun the container with:
 
 ```bash
-docker run -p 5000:5000 --env-file .env proshop
+```bash
+docker run -p 5000:5000 --env-file .env -e NODE_ENV=production proshop
 ```
 
 *   `-p 5000:5000`: Maps port 5000 (Host) -> 5000 (Container).
-*   `--env-file .env`: Passes your local `.env` file (Database keys etc.) into the container.
+*   `--env-file .env`: Passes your local secrets.
+*   `-e NODE_ENV=production`: FORCE production mode so the server displays the website (instead of the "API is running" message).
 
 ## Access the App
 
