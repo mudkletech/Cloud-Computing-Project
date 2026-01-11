@@ -22,10 +22,11 @@ docker build -f proshop_docker/Dockerfile -t proshop .
 Once built, tun the container with:
 
 ```bash
-docker run -p 5000:5000 proshop
+docker run -p 5000:5000 --env-file .env proshop
 ```
 
-*   `-p 5000:5000`: Maps port 5000 on your computer to port 5000 in the container.
+*   `-p 5000:5000`: Maps port 5000 (Host) -> 5000 (Container).
+*   `--env-file .env`: Passes your local `.env` file (Database keys etc.) into the container.
 
 ## Access the App
 
