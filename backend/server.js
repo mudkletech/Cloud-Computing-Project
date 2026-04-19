@@ -15,11 +15,11 @@ import uploadRoutes from './routes/uploadRoutes.js'
 
 dotenv.config()
 
-connectDB()
+const NODE_ENV = process.env.NODE_ENV || 'development'
 
 const app = express()
 
-if (process.env.NODE_ENV === 'development') {
+if (NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
@@ -37,7 +37,7 @@ app.get('/api/config/paypal', (req, res) =>
 const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
-if (process.env.NODE_ENV === 'production') {
+if (NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '/frontend/build')
   console.log(`Checking for frontend build at: ${buildPath}`)
 
@@ -66,9 +66,23 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
 
-app.listen(
-  PORT,
-  console.log(
-    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
+const startServer = async () => {
+  try {
+    await connectDB()
+  } catch (error) {
+    console.error(`Error: ${error.message}`.red.underline.bold)
+
+    if (NODE_ENV === 'production') {
+      process.exit(1)
+    }
+
+    console.log('Continuing without database in development mode'.yellow.bold)
+  }
+
+  app.listen(
+    PORT,
+    console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`.yellow.bold)
   )
-)
+}
+
+startServer()
